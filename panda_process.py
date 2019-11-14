@@ -129,7 +129,7 @@ def body_vector(left_ear,right_ear,tail,head):
                    'Tail_to_Nose':tail_nose_list,
                    'Rotation':body_rotation,
                    'Rotational_Speed':np.gradient(body_rotation)}
-    output_panda = pd.DataFrame(output_dict,columns=list(output_dict.keys))
+    output_panda = pd.DataFrame(output_dict,columns=list(output_dict.keys()))
     return output_panda
     
     
