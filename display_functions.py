@@ -11,75 +11,268 @@ import matplotlib.animation as animation
 import seaborn as sns
 import numpy as np
 
-def plot_animal(animal):
+def plot_animal(animal,title):
     max_x = 0
     max_y = 0
     for key in animal:
         if 'right' in key:
-            rightear  = animal[key]
-            cur_max_x = rightear['x'].max()
-            cur_max_y = rightear['y'].max()
+            rightear1  = animal[key]
+            cur_max_x = rightear1['x'].max()
+            cur_max_y = rightear1['y'].max()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
         elif 'left' in key:
-            leftear = animal[key]
-            cur_max_x = leftear['x'].max()
-            cur_max_y = leftear['y'].max()
+            leftear1 = animal[key]
+            cur_max_x = leftear1['x'].max()
+            cur_max_y = leftear1['y'].max()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
         elif 'tail' in key:
-            tail = animal[key]
-            cur_max_x = tail['x'].max()
-            cur_max_y = tail['y'].max()
+            tail1 = animal[key]
+            cur_max_x = tail1['x'].max()
+            cur_max_y = tail1['y'].max()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
         elif 'nose' in key:
-            nose = animal[key]
-            cur_max_x = nose['x'].max()
-            cur_max_y = nose['y'].max()
+            nose1 = animal[key]
+            cur_max_x = nose1['x'].max()
+            cur_max_y = nose1['y'].max()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
-    num_frames = len(nose)
+                
+                
+    num_frames = len(nose1)
     max_x = int(max_x + 5)
     max_y = int(max_y + 5)
     Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=20, metadata=dict(artist='PeterV'),bitrate=1500)
-    fig = plt.figure(figsize=(10,6))
-    plt.xlim(0,max_x)
-    plt.ylim(0,max_y)
-    plt.title('Motion of a single opponent',fontsize = 20)
+    writer = Writer(fps=50, metadata=dict(artist='PeterV'),bitrate=1500)
     
-    def animate(i):
-        tail_x = tail['x'].iloc[i]
-        tail_y = tail['y'].iloc[i]
-        plt.scatter(tail_x,tail_y,s=10,c='r',marker="v")
+    ear_axis_x1   = [rightear1['x'].iloc[0],leftear1['x'].iloc[0]]
+    ear_axis_y1   = [rightear1['y'].iloc[0],leftear1['y'].iloc[0]]
+    
+    ear_mid_point_x1 = ear_axis_x1[0] + 1/2 * (ear_axis_x1[1] - ear_axis_x1[0])
+    ear_mid_point_y1 = ear_axis_y1[0] + 1/2 * (ear_axis_y1[1] - ear_axis_y1[0])
+    
+    tail1_axis_x1 = [tail1['x'].iloc[0],ear_mid_point_x1]
+    tail1_axis_y1 = [tail1['y'].iloc[0],ear_mid_point_y1]
+    
+    nose1_axis_x1 = [ear_mid_point_x1,nose1['x'].iloc[0]]
+    nose1_axis_y1 = [ear_mid_point_y1,nose1['y'].iloc[0]]
+    
+    fig, ax = plt.subplots(1)
+    
+    line1 = ax.plot(tail1_axis_x1,tail1_axis_y1)[0]
+    line2 = ax.plot(ear_axis_x1,ear_axis_y1)[0]
+    line3 = ax.plot(nose1_axis_x1,nose1_axis_y1)[0]
+    
+    ax.set_xlim(0, 300)
+    ax.set_ylim(0, 300)
+
+    
+    def animate(i, line1,line2,line3):
         
-        leftear_x = leftear['x'].iloc[i]
-        leftear_y = leftear['y'].iloc[i]
-        plt.scatter(leftear_x,leftear_y,s=10,c='r',marker="<")
+        ear_axis_x1   = [rightear1['x'].iloc[i],leftear1['x'].iloc[i]]
+        ear_axis_y1   = [rightear1['y'].iloc[i],leftear1['y'].iloc[i]]
+    
+        ear_mid_point_x1 = ear_axis_x1[0] + 1/2 * (ear_axis_x1[1] - ear_axis_x1[0])
+        ear_mid_point_y1 = ear_axis_y1[0] + 1/2 * (ear_axis_y1[1] - ear_axis_y1[0])
+    
+        tail1_axis_x1 = [tail1['x'].iloc[i],ear_mid_point_x1]
+        tail1_axis_y1 = [tail1['y'].iloc[i],ear_mid_point_y1]
+    
+        nose1_axis_x1 = [ear_mid_point_x1,nose1['x'].iloc[i]]
+        nose1_axis_y1 = [ear_mid_point_y1,nose1['y'].iloc[i]]
+    
+        line1.set_xdata(tail1_axis_x1)
+        line1.set_ydata(tail1_axis_y1)
         
-        rightear_x = rightear['x'].iloc[i]
-        rightear_y = rightear['y'].iloc[i]
-        plt.scatter(rightear_x,rightear_y,s=10,c='r',marker=">")
+        line2.set_xdata(ear_axis_x1)
+        line2.set_ydata(ear_axis_y1)
         
-        nose_x = nose['x'].iloc[i]
-        nose_y = nose['y'].iloc[i]
-        plt.scatter(nose_x,nose_y,s=10,c='r',marker="^")
+        line3.set_xdata(nose1_axis_x1)
+        line3.set_ydata(nose1_axis_y1)
         
-    ani = animation.FuncAnimation(fig, animate, frames=num_frames, repeat=True)
+        return (line1,line2,line3)
+                
+    ani = animation.FuncAnimation(fig, animate, frames=num_frames, fargs=[line1,line2,line3])
     
-    plt.show()
-    
-    ani.save('Single_Animal_Animation.mp4',writer=writer)
-    
+    file_name = title + '.mp4'
+    ani.save(file_name,writer=writer)
     
     
+def plot_two_animals(animal1,animal2,title):
+    max_x = 0
+    max_y = 0
+    for key in animal1:
+        if 'right' in key:
+            rightear1  = animal1[key]
+            cur_max_x = rightear1['x'].max()
+            cur_max_y = rightear1['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'left' in key:
+            leftear1 = animal1[key]
+            cur_max_x = leftear1['x'].max()
+            cur_max_y = leftear1['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'tail' in key:
+            tail1 = animal1[key]
+            cur_max_x = tail1['x'].max()
+            cur_max_y = tail1['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'nose' in key:
+            nose1 = animal1[key]
+            cur_max_x = nose1['x'].max()
+            cur_max_y = nose1['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+                
+    for key in animal2:
+        if 'right' in key:
+            rightear2  = animal2[key]
+            cur_max_x = rightear2['x'].max()
+            cur_max_y = rightear2['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'left' in key:
+            leftear2 = animal2[key]
+            cur_max_x = leftear2['x'].max()
+            cur_max_y = leftear2['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'tail' in key:
+            tail2 = animal2[key]
+            cur_max_x = tail2['x'].max()
+            cur_max_y = tail2['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+        elif 'nose' in key:
+            nose2 = animal2[key]
+            cur_max_x = nose2['x'].max()
+            cur_max_y = nose2['y'].max()
+            if cur_max_x > max_x:
+                max_x = cur_max_x
+            if cur_max_y > max_y:
+                max_y = cur_max_y
+                
+                
+    num_frames = len(nose1)
+    max_x = int(max_x + 5)
+    max_y = int(max_y + 5)
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=50, metadata=dict(artist='PeterV'),bitrate=1500)
     
+    ear_axis_x1   = [rightear1['x'].iloc[0],leftear1['x'].iloc[0]]
+    ear_axis_y1   = [rightear1['y'].iloc[0],leftear1['y'].iloc[0]]
+    
+    ear_mid_point_x1 = ear_axis_x1[0] + 1/2 * (ear_axis_x1[1] - ear_axis_x1[0])
+    ear_mid_point_y1 = ear_axis_y1[0] + 1/2 * (ear_axis_y1[1] - ear_axis_y1[0])
+    
+    tail1_axis_x1 = [tail1['x'].iloc[0],ear_mid_point_x1]
+    tail1_axis_y1 = [tail1['y'].iloc[0],ear_mid_point_y1]
+    
+    nose1_axis_x1 = [ear_mid_point_x1,nose1['x'].iloc[0]]
+    nose1_axis_y1 = [ear_mid_point_y1,nose1['y'].iloc[0]]
+    
+    
+    ear_axis_x2   = [rightear2['x'].iloc[0],leftear2['x'].iloc[0]]
+    ear_axis_y2   = [rightear2['y'].iloc[0],leftear2['y'].iloc[0]]
+    
+    ear_mid_point_x2 = ear_axis_x2[0] + 1/2 * (ear_axis_x2[1] - ear_axis_x2[0])
+    ear_mid_point_y2 = ear_axis_y2[0] + 1/2 * (ear_axis_y2[1] - ear_axis_y2[0])
+    
+    tail1_axis_x2 = [tail2['x'].iloc[0],ear_mid_point_x2]
+    tail1_axis_y2 = [tail2['y'].iloc[0],ear_mid_point_y2]
+    
+    nose1_axis_x2 = [ear_mid_point_x2,nose2['x'].iloc[0]]
+    nose1_axis_y2 = [ear_mid_point_y2,nose2['y'].iloc[0]]
+    
+    fig, ax = plt.subplots(1)
+    
+    line1 = ax.plot(tail1_axis_x1,tail1_axis_y1)[0]
+    line2 = ax.plot(ear_axis_x1,ear_axis_y1)[0]
+    line3 = ax.plot(nose1_axis_x1,nose1_axis_y1)[0]
+    
+    line4 = ax.plot(tail1_axis_x2,tail1_axis_y2)[0]
+    line5 = ax.plot(ear_axis_x2,ear_axis_y2)[0]
+    line6 = ax.plot(nose1_axis_x2,nose1_axis_y2)[0]
+    
+    ax.set_xlim(0, 300)
+    ax.set_ylim(0, 300)
+
+    
+    def animate(i, line1,line2,line3,line4,line5,line6):
+        
+        ear_axis_x1   = [rightear1['x'].iloc[i],leftear1['x'].iloc[i]]
+        ear_axis_y1   = [rightear1['y'].iloc[i],leftear1['y'].iloc[i]]
+    
+        ear_mid_point_x1 = ear_axis_x1[0] + 1/2 * (ear_axis_x1[1] - ear_axis_x1[0])
+        ear_mid_point_y1 = ear_axis_y1[0] + 1/2 * (ear_axis_y1[1] - ear_axis_y1[0])
+    
+        tail1_axis_x1 = [tail1['x'].iloc[i],ear_mid_point_x1]
+        tail1_axis_y1 = [tail1['y'].iloc[i],ear_mid_point_y1]
+    
+        nose1_axis_x1 = [ear_mid_point_x1,nose1['x'].iloc[i]]
+        nose1_axis_y1 = [ear_mid_point_y1,nose1['y'].iloc[i]]
+        
+        
+        ear_axis_x2   = [rightear2['x'].iloc[i],leftear2['x'].iloc[i]]
+        ear_axis_y2   = [rightear2['y'].iloc[i],leftear2['y'].iloc[i]]
+    
+        ear_mid_point_x2 = ear_axis_x2[0] + 1/2 * (ear_axis_x2[1] - ear_axis_x2[0])
+        ear_mid_point_y2 = ear_axis_y2[0] + 1/2 * (ear_axis_y2[1] - ear_axis_y2[0])
+    
+        tail1_axis_x2 = [tail2['x'].iloc[i],ear_mid_point_x2]
+        tail1_axis_y2 = [tail2['y'].iloc[i],ear_mid_point_y2]
+    
+        nose1_axis_x2 = [ear_mid_point_x2,nose2['x'].iloc[i]]
+        nose1_axis_y2 = [ear_mid_point_y2,nose2['y'].iloc[i]]
+    
+        line1.set_xdata(tail1_axis_x1)
+        line1.set_ydata(tail1_axis_y1)
+        
+        line2.set_xdata(ear_axis_x1)
+        line2.set_ydata(ear_axis_y1)
+        
+        line3.set_xdata(nose1_axis_x1)
+        line3.set_ydata(nose1_axis_y1)
+        
+        line4.set_xdata(tail1_axis_x2)
+        line4.set_ydata(tail1_axis_y2)
+        
+        line5.set_xdata(ear_axis_x2)
+        line5.set_ydata(ear_axis_y2)
+        
+        line6.set_xdata(nose1_axis_x2)
+        line6.set_ydata(nose1_axis_y2)
+        
+        return (line1,line2,line3,line4,line5,line6)
+                
+    ani = animation.FuncAnimation(fig, animate, frames=num_frames, fargs=[line1,line2,line3,line4,line5,line6])
+    
+    file_name = title + '.mp4'
+    ani.save(file_name,writer=writer)
