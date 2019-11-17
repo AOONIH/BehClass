@@ -14,44 +14,72 @@ import numpy as np
 def plot_animal(animal,title):
     max_x = 0
     max_y = 0
+    min_x = 1000
+    min_y = 1000
     for key in animal:
         if 'right' in key:
             rightear1  = animal[key]
             cur_max_x = rightear1['x'].max()
             cur_max_y = rightear1['y'].max()
+            cur_min_x = rightear1['x'].min()
+            cur_min_y = rightear1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'left' in key:
             leftear1 = animal[key]
             cur_max_x = leftear1['x'].max()
             cur_max_y = leftear1['y'].max()
+            cur_min_x = leftear1['x'].min()
+            cur_min_y = leftear1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'tail' in key:
             tail1 = animal[key]
             cur_max_x = tail1['x'].max()
             cur_max_y = tail1['y'].max()
+            cur_min_x = tail1['x'].min()
+            cur_min_y = tail1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'nose' in key:
             nose1 = animal[key]
             cur_max_x = nose1['x'].max()
             cur_max_y = nose1['y'].max()
+            cur_min_x = nose1['x'].min()
+            cur_min_y = nose1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
                 
                 
     num_frames = len(nose1)
     max_x = int(max_x + 5)
     max_y = int(max_y + 5)
+    min_x = int(min_x - 5)
+    min_y = int(min_y - 5)
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=50, metadata=dict(artist='PeterV'),bitrate=1500)
     
@@ -73,8 +101,8 @@ def plot_animal(animal,title):
     line2 = ax.plot(ear_axis_x1,ear_axis_y1)[0]
     line3 = ax.plot(nose1_axis_x1,nose1_axis_y1)[0]
     
-    ax.set_xlim(0, 300)
-    ax.set_ylim(0, 300)
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
 
     
     def animate(i, line1,line2,line3):
@@ -111,78 +139,130 @@ def plot_animal(animal,title):
 def plot_two_animals(animal1,animal2,title):
     max_x = 0
     max_y = 0
-    for key in animal1:
+    min_x = 1000
+    min_y = 1000
+    for key in animal:
         if 'right' in key:
-            rightear1  = animal1[key]
+            rightear1  = animal[key]
             cur_max_x = rightear1['x'].max()
             cur_max_y = rightear1['y'].max()
+            cur_min_x = rightear1['x'].min()
+            cur_min_y = rightear1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'left' in key:
-            leftear1 = animal1[key]
+            leftear1 = animal[key]
             cur_max_x = leftear1['x'].max()
             cur_max_y = leftear1['y'].max()
+            cur_min_x = leftear1['x'].min()
+            cur_min_y = leftear1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'tail' in key:
-            tail1 = animal1[key]
+            tail1 = animal[key]
             cur_max_x = tail1['x'].max()
             cur_max_y = tail1['y'].max()
+            cur_min_x = tail1['x'].min()
+            cur_min_y = tail1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'nose' in key:
-            nose1 = animal1[key]
+            nose1 = animal[key]
             cur_max_x = nose1['x'].max()
             cur_max_y = nose1['y'].max()
+            cur_min_x = nose1['x'].min()
+            cur_min_y = nose1['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
                 
     for key in animal2:
         if 'right' in key:
             rightear2  = animal2[key]
             cur_max_x = rightear2['x'].max()
             cur_max_y = rightear2['y'].max()
+            cur_min_x = rightear2['x'].min()
+            cur_min_y = rightear2['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'left' in key:
             leftear2 = animal2[key]
             cur_max_x = leftear2['x'].max()
             cur_max_y = leftear2['y'].max()
+            cur_min_x = leftear2['x'].min()
+            cur_min_y = leftear2['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'tail' in key:
             tail2 = animal2[key]
             cur_max_x = tail2['x'].max()
             cur_max_y = tail2['y'].max()
+            cur_min_x = tail2['x'].min()
+            cur_min_y = tail2['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
         elif 'nose' in key:
             nose2 = animal2[key]
             cur_max_x = nose2['x'].max()
             cur_max_y = nose2['y'].max()
+            cur_min_x = nose2['x'].min()
+            cur_min_y = nose2['y'].min()
             if cur_max_x > max_x:
                 max_x = cur_max_x
             if cur_max_y > max_y:
                 max_y = cur_max_y
+            if cur_min_x < min_x:
+                min_x = cur_min_x
+            if cur_min_y < min_y:
+                min_y = cur_min_y
                 
                 
     num_frames = len(nose1)
     max_x = int(max_x + 5)
     max_y = int(max_y + 5)
+    min_x = int(min_x - 5)
+    min_y = int(min_y - 5)
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=50, metadata=dict(artist='PeterV'),bitrate=1500)
     
@@ -221,8 +301,8 @@ def plot_two_animals(animal1,animal2,title):
     line5 = ax.plot(ear_axis_x2,ear_axis_y2)[0]
     line6 = ax.plot(nose1_axis_x2,nose1_axis_y2)[0]
     
-    ax.set_xlim(0, 300)
-    ax.set_ylim(0, 300)
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
 
     
     def animate(i, line1,line2,line3,line4,line5,line6):
