@@ -11,8 +11,29 @@ import numpy as np
 def get_SVD(animal):
     pass
 
-def concatenate_body(animal):
-    pass
+def format_data(animal,num_coords = 3):
+    animal_parts = list()
+    for key in animal:
+        animal_parts.append(animal[key])
+    num_samples = len(animal_parts[0])
+    num_parts   = len(animal_parts)
+    num_columns = num_samples
+    
+    coords = list()
+    
+    for dot in range(num_parts):
+        cur_part = animal_parts[dot]
+        cur_animal_array = np.empty([num_coords,num_columns])
+        for time in range(num_samples):
+            cur_animal_array[:,time] = list(cur_part.iloc[time])
+        coords.append(cur_animal_array)
+    output_mat = coords[0]
+    for dot in range(1,num_parts):
+        output_mat = np.concatenate((output_mat,coords[dot]),axis = 0)
+    
+    return output_mat
+            
+    
 
 def reset_reference(animal):
     for key in animal:
