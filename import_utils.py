@@ -44,13 +44,17 @@ def reject_start_segment(panda_dict):
     delete_columns = list()
     for row in range(num_rows):
         cur_row_val = test_panda.iloc[row]
+        cur_row_val = cur_row_val[0:2]
         for key in panda_dict:
             cur_comp_panda = panda_dict[key]
             cur_comp_val = cur_comp_panda.iloc[row]
+            cur_comp_val = cur_comp_val[0:2]
             if cur_row_val.equals(cur_comp_val):
                 delete_columns.append(row)
             else:
-                return delete_columns
+                
+                return delete_columns[-1]
+
 
 def trim_start(panda_dict):
     reject_times = reject_start_segment(panda_dict)

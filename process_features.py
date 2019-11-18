@@ -6,6 +6,9 @@ Created on Sat Nov 16 13:39:09 2019
 
 import pandas as pd
 import numpy as np
+import math
+from scipy import signal
+from sklearn.decomposition import PCA
 
 def get_SVD(animal_SVD_mat):
     m_val = animal_SVD_mat.shape[0]
@@ -167,7 +170,76 @@ def reference_to_ani(animal1,animal2):
             animal2[key] = nose2
     
     return animal1, animal2
-        
 
-def dif_matrix(animal1,animal2):
+def get_distance(series1,series2):
+    distance = np.sqrt(sum((series1-series2) ** 2))
+    if distance < 1/100:
+        distance = 0.0
+    return distance
+
+def dif_matrix(animal1,animal2,start_time = 0):
+    parts_ani1 = len(animal1)
+    parts_ani2 = len(animal2)
+    cur_time = start_time
+    example_dict = animal1[list(animal1.keys())[0]]
+    max_len = len(example_dict)
+    empty_frame = np.empty([parts_ani1+parts_ani1, parts_ani2+parts_ani2])
+    data_store = np.empty([(parts_ani1+parts_ani1) ** 2,1])
     
+    for counter in range(cur_time,max_len):
+        row = 0 
+        for key1 in animal1:
+            col = 0
+            cur_main_part = animal1[key1]
+            cur_point = cur_main_part.iloc[counter]
+            for key2 in animal1:
+                cur_comp_part = animal1[key2]
+                cur_comp_point= cur_comp_part.iloc[counter]
+                distance = get_distance(cur_point,cur_comp_point)
+                empty_frame[row,col] = distance
+                col = col + 1
+            for key2 in animal2:
+                cur_comp_part = animal2[key2]
+                cur_comp_point= cur_comp_part.iloc[counter]
+                distance = get_distance(cur_point,cur_comp_point)
+                empty_frame[row,col] = distance
+                col = col + 1
+            row = row + 1
+        for key1 in animal2:
+            col = 0
+            cur_main_part = animal2[key1]
+            cur_point = cur_main_part.iloc[counter]
+            for key2 in animal1:
+                cur_comp_part = animal1[key2]
+                cur_comp_point= cur_comp_part.iloc[counter]
+                distance = get_distance(cur_point,cur_comp_point)
+                empty_frame[row,col] = distance
+                col = col + 1
+            for key2 in animal2:
+                cur_comp_part = animal2[key2]
+                cur_comp_point= cur_comp_part.iloc[counter]
+                distance = get_distance(cur_point,cur_comp_point)
+                empty_frame[row,col] = distance
+                col = col + 1
+            row = row + 1
+        flat_time = empty_frame.flatten('F')
+        flat_time = np.reshape(flat_time,[(parts_ani1+parts_ani1) ** 2,1])
+        data_store= np.concatenate((data_store,flat_time),axis = 1)
+    data_store = data_store[:,1:]
+    
+def perform_pca(difference_mat,threshold = 0.05):
+    pca = PCA()
+    pca.fit(difference_mat)
+    singular_values = pca.singular_values_
+    tot_sing = sum(singular_values)
+    selected_components = singular_values > (tot_sing * threshold)
+    all_components =  pca.components_
+    selected_components = all_components[selected_components,:]
+    
+    return selected_components
+
+def take_spectrum(pcs,frame_rate = 50):
+    new_matrix = list()
+    for component in range(pcs.shape[0]):
+        new_matrix.append(signal.spectrogram(pcs[component,:],frame_rate))
+    return new_matrix
