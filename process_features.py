@@ -112,7 +112,7 @@ def reference_to_ani(animal1,animal2):
         elif 'nose' in key:
             nose2 = animal2[key]
     
-    num_frames = len(nose)
+    num_frames = len(nose1)
     
     for frame in range(num_frames):
         
@@ -226,6 +226,8 @@ def dif_matrix(animal1,animal2,start_time = 0):
         flat_time = np.reshape(flat_time,[(parts_ani1+parts_ani1) ** 2,1])
         data_store= np.concatenate((data_store,flat_time),axis = 1)
     data_store = data_store[:,1:]
+    data_store = data_store.transpose()
+    return data_store
     
 def perform_pca(difference_mat,threshold = 0.05):
     pca = PCA()
