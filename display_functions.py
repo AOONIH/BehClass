@@ -141,9 +141,9 @@ def plot_two_animals(animal1,animal2,title):
     max_y = 0
     min_x = 1000
     min_y = 1000
-    for key in animal:
+    for key in animal1:
         if 'right' in key:
-            rightear1  = animal[key]
+            rightear1  = animal1[key]
             cur_max_x = rightear1['x'].max()
             cur_max_y = rightear1['y'].max()
             cur_min_x = rightear1['x'].min()
@@ -157,7 +157,7 @@ def plot_two_animals(animal1,animal2,title):
             if cur_min_y < min_y:
                 min_y = cur_min_y
         elif 'left' in key:
-            leftear1 = animal[key]
+            leftear1 = animal1[key]
             cur_max_x = leftear1['x'].max()
             cur_max_y = leftear1['y'].max()
             cur_min_x = leftear1['x'].min()
@@ -171,7 +171,7 @@ def plot_two_animals(animal1,animal2,title):
             if cur_min_y < min_y:
                 min_y = cur_min_y
         elif 'tail' in key:
-            tail1 = animal[key]
+            tail1 = animal1[key]
             cur_max_x = tail1['x'].max()
             cur_max_y = tail1['y'].max()
             cur_min_x = tail1['x'].min()
@@ -185,7 +185,7 @@ def plot_two_animals(animal1,animal2,title):
             if cur_min_y < min_y:
                 min_y = cur_min_y
         elif 'nose' in key:
-            nose1 = animal[key]
+            nose1 = animal1[key]
             cur_max_x = nose1['x'].max()
             cur_max_y = nose1['y'].max()
             cur_min_x = nose1['x'].min()
@@ -303,6 +303,8 @@ def plot_two_animals(animal1,animal2,title):
     
     ax.set_xlim(min_x, max_x)
     ax.set_ylim(min_y, max_y)
+    ax.tick_params(which='both',bottom=False,top=False,left=False,right=False,
+                   labelbottom=False,labelleft=False)
 
     
     def animate(i, line1,line2,line3,line4,line5,line6):

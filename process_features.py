@@ -9,6 +9,9 @@ import numpy as np
 import math
 from scipy import signal
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import umap
+
 
 def get_SVD(animal_SVD_mat):
     m_val = animal_SVD_mat.shape[0]
@@ -92,6 +95,23 @@ def reset_reference(animal):
     
     return animal
 
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2):
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+def rotate_vector(vector_x,vector_y,rotation):
+    if vector_x < 0:
+        rotation = rotation * -1
+        
+    new_x = vector_x * math.cos(rotation) - vector_y * math.sin(rotation)
+    new_y = vector_y * math.cos(rotation) - vector_x * math.sin(rotation)
+    return (new_x,new_y)
+
 def reference_to_ani(animal1,animal2):
     for key in animal1:
         if 'right' in key:
@@ -140,11 +160,36 @@ def reference_to_ani(animal1,animal2):
         
         cur_reference  = cur_reference - cur_reference
         
+        cur_ear_mid = cur_left_ear1[0:2] + (1/2 * (cur_right_ear1[0:2]-cur_left_ear1[0:2]))
+        
+        
+        rotation = angle_between(cur_ear_mid,[0,1])
         tail1.iloc[frame] = cur_reference
+        
+        cur_right_ear1[0],cur_right_ear1[1] = rotate_vector(cur_right_ear1[0],cur_right_ear1[1],rotation)
+        cur_left_ear1[0],cur_left_ear1[1] = rotate_vector(cur_left_ear1[0],cur_left_ear1[1],rotation)
+        cur_nose1[0],cur_nose1[1] = rotate_vector(cur_nose1[0],cur_nose1[1],rotation)
+        
+        cur_tail2[0],cur_tail2[1] = rotate_vector(cur_tail2[0],cur_tail2[1],rotation)
+        cur_right_ear2[0],cur_right_ear2[1] = rotate_vector(cur_right_ear2[0],cur_right_ear2[1],rotation)
+        cur_left_ear2[0],cur_left_ear2[1] = rotate_vector(cur_left_ear2[0],cur_left_ear2[1],rotation)
+        cur_nose2[0],cur_nose2[1] = rotate_vector(cur_nose2[0],cur_nose2[1],rotation)
+        
+        cur_ear_mid = cur_left_ear1[0:2] + (1/2 * (cur_right_ear1[0:2]-cur_left_ear1[0:2]))
+        
+        if cur_ear_mid[1] < 0:
+            cur_right_ear1[1] = cur_right_ear1[1] * -1
+            cur_left_ear1[1] = cur_left_ear1[1] * -1
+            cur_nose1[1] = cur_nose1[1] * -1
+            
+            cur_tail2[1] = cur_tail2[1] * -1
+            cur_right_ear2[1] = cur_right_ear2[1] * -1
+            cur_left_ear2[1] = cur_left_ear2[1] * -1
+            cur_nose2[1] = cur_nose2[1] * -1
+        
         rightear1.iloc[frame] = cur_right_ear1
         leftear1.iloc[frame]  = cur_left_ear1
         nose1.iloc[frame]     = cur_nose1
-        
         tail2.iloc[frame] = cur_tail2
         rightear2.iloc[frame] = cur_right_ear2
         leftear2.iloc[frame]  = cur_left_ear2
@@ -226,9 +271,8 @@ def dif_matrix(animal1,animal2,start_time = 0):
         flat_time = np.reshape(flat_time,[(parts_ani1+parts_ani1) ** 2,1])
         data_store= np.concatenate((data_store,flat_time),axis = 1)
     data_store = data_store[:,1:]
-    data_store = data_store.transpose()
     return data_store
-    
+
 def perform_pca(difference_mat,threshold = 0.05):
     pca = PCA()
     pca.fit(difference_mat)
@@ -240,8 +284,33 @@ def perform_pca(difference_mat,threshold = 0.05):
     
     return selected_components
 
-def take_spectrum(pcs,frame_rate = 50):
-    new_matrix = list()
-    for component in range(pcs.shape[0]):
-        new_matrix.append(signal.spectrogram(pcs[component,:],frame_rate))
-    return new_matrix
+def take_spectrum(pcs,frame_rate = 50,width = 0.25):
+    max_width = int(frame_rate/2)
+    widths = np.arange(width,max_width,width)
+    
+    spectral_components = list()
+    for component in  range(pcs.shape[0]):
+        cur_comp = pcs[component,:]
+        spectral_components.append(signal.cwt(cur_comp,signal.ricker,widths))
+    return spectral_components
+
+def gen_tsne(spectra_list,pooling = 1):
+    tsne_vector = spectra_list[0]
+    for spectra in range(1,len(spectra_list)):
+        tsne_vector = np.concatenate((tsne_vector,spectra_list[spectra]))
+    pooling = int(pooling)
+    if pooling > 1:
+        counter = 0
+        while 
+    embedded_2 = TSNE(n_components=2).fit_transform(tsne_vector.transpose())
+    embedded_3 = TSNE(n_components=3).fit_transform(tsne_vector.transpose())
+    return (embedded_2, embedded_3)
+    
+def gen_umap(spectra_list,pooling=1):
+    umap_vector = spectra_list[0]
+    for spectra in range(1,len(spectra_list)):
+        umap_vector = np.concatenate((umap_vector,spectra_list[spectra]))
+    reducer = umap.UMAP()
+    embedding_umap = reducer.fit_transform(umap_vector)
+    return embedding_umap
+        
